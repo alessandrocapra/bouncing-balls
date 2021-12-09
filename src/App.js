@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { ClickCoordinates } from "./interfaces/App.interface";
-import { render } from "@testing-library/react";
 
 const Layout = styled.div`
   width: 100vw;
@@ -21,7 +20,7 @@ class Circle {
   constructor(context, position, velocity) {
     this.context = context;
     this.position = position;
-    // this.velocity = velocity;
+    this.velocity = velocity;
   }
 
   draw() {
@@ -32,11 +31,9 @@ class Circle {
   }
 
   fall() {
-    // this.velocity += gravity;
-    // this.position += this.velocity;
-    console.log("old position: " + this.position.y);
-    this.position.y += 1;
-    console.log("new position: " + this.position.y);
+    this.velocity += gravity;
+    this.position.y += this.velocity;
+    // this.position.y += 1;
 
     this.draw();
   }
@@ -46,6 +43,26 @@ function App() {
   let ref = useRef();
   let canvas = ref.current;
   let circlesArray = [];
+
+  useEffect(() => {
+    let canvas = ref.current;
+    let context = canvas.getContext("2d");
+    let requestId;
+
+    const render = () => {
+      context.clearRect(0, 0, 700, 500);
+      for (let i = 0; i < circlesArray.length; i++) {
+        circlesArray[i].fall();
+      }
+      requestId = requestAnimationFrame(render);
+    };
+
+    render();
+    
+    return () => {
+      cancelAnimationFrame(requestId);
+    };
+  });
 
   const getClickCoordinates = (event, canvas) => {
     const boundaries = canvas.getBoundingClientRect();
@@ -60,9 +77,9 @@ function App() {
       let context = canvas.getContext("2d");
 
       let circle = new Circle(context, getClickCoordinates(event, canvas), 0);
-      circle.draw();
+      circle.fall();
 
-      // circlesArray.push(circle);
+      circlesArray.push(circle);
     } else {
       // canvas-unsupported code here
     }
