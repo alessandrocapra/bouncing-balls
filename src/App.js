@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { useEffect, useRef, useState } from "react";
-import { ClickCoordinates } from "./interfaces/App.interface";
+import { useEffect, useRef } from "react";
+// import { ClickCoordinates } from "./interfaces/App.interface";
+import Circle from "./components/Circle";
 
 const Layout = styled.div`
   width: 100vw;
@@ -13,41 +14,6 @@ const Layout = styled.div`
 const Canvas = styled.canvas`
   border: 1px solid #000;
 `;
-
-const gravity = 0.1;
-
-class Circle {
-  constructor(context, radius, position, velocity) {
-    this.context = context;
-    this.radius = radius;
-    this.position = position;
-    this.velocity = velocity;
-  }
-
-  draw() {
-    this.context.beginPath();
-    this.context.arc(
-      this.position.x,
-      this.position.y,
-      this.radius,
-      0,
-      2 * Math.PI
-    );
-    this.context.fill();
-    this.context.closePath();
-  }
-
-  fall() {
-    if (this.position.y + this.radius > 500) {
-      this.velocity = -this.velocity;
-    } else {
-      this.velocity += gravity;
-    }
-    this.position.y += this.velocity;
-
-    this.draw();
-  }
-}
 
 function App() {
   let ref = useRef();
