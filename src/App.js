@@ -17,23 +17,33 @@ const Canvas = styled.canvas`
 const gravity = 0.1;
 
 class Circle {
-  constructor(context, position, velocity) {
+  constructor(context, radius, position, velocity) {
     this.context = context;
+    this.radius = radius;
     this.position = position;
     this.velocity = velocity;
   }
 
   draw() {
     this.context.beginPath();
-    this.context.arc(this.position.x, this.position.y, 50, 0, 2 * Math.PI);
+    this.context.arc(
+      this.position.x,
+      this.position.y,
+      this.radius,
+      0,
+      2 * Math.PI
+    );
     this.context.fill();
     this.context.closePath();
   }
 
   fall() {
-    this.velocity += gravity;
+    if (this.position.y + this.radius > 500) {
+      this.velocity = -this.velocity;
+    } else {
+      this.velocity += gravity;
+    }
     this.position.y += this.velocity;
-    // this.position.y += 1;
 
     this.draw();
   }
@@ -44,12 +54,17 @@ function App() {
   let canvas = ref.current;
   let circlesArray = [];
 
+  console.log("[App]");
+
   useEffect(() => {
     let canvas = ref.current;
     let context = canvas.getContext("2d");
     let requestId;
 
+    console.log("[useEffect]");
+
     const render = () => {
+      console.log("[render in useEffect]");
       context.clearRect(0, 0, 700, 500);
       for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].fall();
@@ -58,7 +73,7 @@ function App() {
     };
 
     render();
-    
+
     return () => {
       cancelAnimationFrame(requestId);
     };
@@ -75,9 +90,15 @@ function App() {
   const addCircle = (event) => {
     if (canvas != null && canvas.getContext) {
       let context = canvas.getContext("2d");
+      console.log("[addCircle]");
 
-      let circle = new Circle(context, getClickCoordinates(event, canvas), 0);
-      circle.fall();
+      let circle = new Circle(
+        context,
+        30,
+        getClickCoordinates(event, canvas),
+        0
+      );
+      circle.draw();
 
       circlesArray.push(circle);
     } else {
